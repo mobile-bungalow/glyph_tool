@@ -71,11 +71,10 @@
 
                 const notdefGlyph = new opentype.Glyph({
                     name: '.notdef',
-                    advanceWidth: 160,
+                    advanceWidth: 80,
                     path: new opentype.Path()
                 });
 
-                
                 var glyphs = [notdefGlyph];
                 const factor = 10;
 
@@ -98,15 +97,16 @@
                               const isWhite = rgba.every(value => value === 255);
 
                               const xmod = x % charWidth;
-                              const ymod = x % charHeight;
+                              const ymod = y % charHeight;
+                              console.log(xmod, ymod);
                               if (isWhite) {
                                 glyphPath.moveTo(xmod * factor, (charHeight - ymod) * factor);
                                 glyphPath.lineTo((xmod + 1) * factor, (charHeight - ymod) * factor);
                                 glyphPath.lineTo((xmod + 1) * factor, ((charHeight - ymod) - 1) * factor);
                                 glyphPath.lineTo(xmod * factor, ((charHeight - ymod) - 1) * factor);
+                                glyphPath.closePath();
                               }
                           }
-                          glyphPath.closePath();
                           const index = Math.floor(Math.floor(x / charWidth) + (Math.floor(y / charHeight) * (img.width / charWidth)));
                           const customGlyph = new opentype.Glyph({
                             name: 'custom glyph' + index,
