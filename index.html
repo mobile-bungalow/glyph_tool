@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converter</title>
+</head>
+<body>
+     <h2>Select Your Image</h2>
+
+    <!-- File selector for PNGs -->
+    <input type="file" id="pngSelector">
+
+    <!-- Input box for character width -->
+    <label for="charWidth">Char Width:</label>
+    <input type="number" id="charWidth" value="8">
+
+    <!-- Input box for character height -->
+    <label for="charHeight">Char Height:</label>
+    <input type="number" id="charHeight" value="16">
+
+    <!-- Button to generate OTF -->
+    <button onclick="generateOTF()">Generate OTF</button>
+
+   <script src="opentype.js"></script>
+   <script>
+        function generateOTF() {
+            // Get selected PNG file
+            const pngSelector = document.getElementById('pngSelector');
+            const selectedFile = pngSelector.files[0];
+
+            if (selectedFile) {
+                const charWidth = parseInt(document.getElementById('charWidth').value);
+                const charHeight = parseInt(document.getElementById('charHeight').value);
+
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                img.onload = function () {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0, img.width, img.height);
+
+                    // Iterate through pixels
+                    for (let y = 0; y < img.height; y += charHeight) {
+                        for (let x = 0; x < img.width; x += charWidth) {
+                            const pixelData = context.getImageData(x, y, charWidth, charHeight).data;
+
+                          // Chunk pixel data into groups of four (assuming RGBA format)
+                          for (let i = 0; i < pixelData.length; i += 4) {
+                              const rgba = pixelData.slice(i, i + 4);
+
+                              // Check if the pixel is white (assuming white is [255, 255, 255, 255])
+                              const isWhite = rgba.every(value => value === 255);
+
+                              if (isWhite) {
+                                  // Do something when the pixel is white
+                                  console.log('White pixel at', x, y);
+                              }
+                          }
+
+                        }
+                    }
+                };
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                };
+
+                reader.readAsDataURL(selectedFile);
+            } else {
+                alert('Please select a PNG file.');
+            }
+        }
+    </script>
+
+</body>
+</html>
