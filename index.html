@@ -37,6 +37,16 @@
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
 
+                const notdefGlyph = new opentype.Glyph({
+                    name: '.notdef',
+                    advanceWidth: 160,
+                    path: new opentype.Path()
+                });
+
+                
+                var glyphs = [notdefGlyph];
+                const factor = 10;
+
                 img.onload = function () {
                     canvas.width = img.width;
                     canvas.height = img.height;
@@ -48,6 +58,7 @@
                             const pixelData = context.getImageData(x, y, charWidth, charHeight).data;
 
                           // Chunk pixel data into groups of four (assuming RGBA format)
+                          const glyphPath = new opentype.Path();
                           for (let i = 0; i < pixelData.length; i += 4) {
                               const rgba = pixelData.slice(i, i + 4);
 
@@ -55,13 +66,36 @@
                               const isWhite = rgba.every(value => value === 255);
 
                               if (isWhite) {
-                                  // Do something when the pixel is white
-                                  console.log('White pixel at', x, y);
+                                glyphPath.moveTo(x * factor, (img.height - y) * factor);
+                                glyphPath.lineTo((x + 1) * factor, (img.height - y) * factor);
+                                glyphPath.lineTo((x + 1) * factor, (img.height - y - 1) * factor);
+                                glyphPath.lineTo(x * factor, (img.height - y - 1) * factor);
+                                glyphPath.closePath();
                               }
                           }
-
+                          const index = (x / img.width) + ((y / img.height) * (img.width / charWidth));
+                          const customGlyph = new opentype.Glyph({
+                            name: 'CustomGlyph' + index,
+                            unicode: index + 20,
+                            advanceWidth: 160, // Adjust as needed
+                            path: glyphPath
+                          });
+                          glyphs.push(customGlyph);
+                          
                         }
                     }
+ 
+                const font = new opentype.Font({
+                    familyName: 'hortau_noise',
+                    styleName: 'Medium',
+                    unitsPerEm: 100,
+                    ascender: 80,
+                    descender: 0,
+                    glyphs: glyphs
+                });
+                
+                font.download();
+
                 };
 
                 const reader = new FileReader();
@@ -71,7 +105,7 @@
 
                 reader.readAsDataURL(selectedFile);
             } else {
-                alert('Please select a PNG file.');
+                alert('Please select an image file.');
             }
         }
     </script>
