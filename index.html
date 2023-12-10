@@ -97,17 +97,19 @@
                               // Check if the pixel is white (assuming white is [255, 255, 255, 255])
                               const isWhite = rgba.every(value => value === 255);
 
+                              const xmod = x % charWidth;
+                              const ymod = x % charHeight;
                               if (isWhite) {
-                                glyphPath.moveTo(x * factor, (img.height - y) * factor);
-                                glyphPath.lineTo((x + 1) * factor, (img.height - y) * factor);
-                                glyphPath.lineTo((x + 1) * factor, (img.height - y - 1) * factor);
-                                glyphPath.lineTo(x * factor, (img.height - y - 1) * factor);
-                                glyphPath.closePath();
+                                glyphPath.moveTo(xmod * factor, (charHeight - ymod) * factor);
+                                glyphPath.lineTo((xmod + 1) * factor, (charHeight - ymod) * factor);
+                                glyphPath.lineTo((xmod + 1) * factor, ((charHeight - ymod) - 1) * factor);
+                                glyphPath.lineTo(xmod * factor, ((charHeight - ymod) - 1) * factor);
                               }
                           }
-                          const index = (x / img.width) + ((y / img.height) * (img.width / charWidth));
+                          glyphPath.closePath();
+                          const index = Math.floor(Math.floor(x / charWidth) + (Math.floor(y / charHeight) * (img.width / charWidth)));
                           const customGlyph = new opentype.Glyph({
-                            name: 'CustomGlyph' + index,
+                            name: 'custom glyph' + index,
                             unicode: index + 20,
                             advanceWidth: 160, // Adjust as needed
                             path: glyphPath
