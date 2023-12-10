@@ -96,9 +96,9 @@
                               // Check if the pixel is white (assuming white is [255, 255, 255, 255])
                               const isWhite = rgba.every(value => value === 255);
 
-                              const xmod = x % charWidth;
-                              const ymod = y % charHeight;
-                              console.log(xmod, ymod);
+                              const xmod = i % charWidth;
+                              const ymod = Math.floor(i / charHeight);
+                              console.log(x, charWidth, y, charHeight, xmod, ymod);
                               if (isWhite) {
                                 glyphPath.moveTo(xmod * factor, (charHeight - ymod) * factor);
                                 glyphPath.lineTo((xmod + 1) * factor, (charHeight - ymod) * factor);
